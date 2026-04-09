@@ -1,0 +1,152 @@
+import tkinter as tk
+from tkinter import ttk, messagebox
+import json, os
+
+ARCHIVO = "inventario.json"
+inventario = []
+
+USUARIO = "Anderson"
+PASSWORD = "1234"
+
+# ---------------- DATOS ---------------- #
+
+def cargar():
+    global inventario
+    if os.path.exists(ARCHIVO):
+        with open(ARCHIVO, "r") as f:
+            inventario = json.load(f)
+
+def guardar():
+    with open(ARCHIVO, "w") as f:
+        json.dump(inventario, f)
+
+# ---------------- LOGIN ---------------- #
+
+def login():
+    if user.get() == USUARIO and password.get() == PASSWORD:
+        frame_login.pack_forget()
+        frame_sistema.pack(fill="both", expand=True)
+    else:
+        messagebox.showerror("Error", "Datos incorrectos")
+
+# ---------------- NAVEGACION ---------------- #
+
+def mostrar(frame):
+    for f in [frame_inicio, frame_inventario, frame_caja]:
+        f.pack_forget()
+    frame.pack(fill="both", expand=True)
+
+# ---------------- INVENTARIO ---------------- #
+
+def actualizar_lista():
+    tabla.delete(*tabla.get_children())
+    tabla_caja.delete(*tabla_caja.get_children())
+
+    for i, item in enumerate(inventario):
+        datos = (item["producto"], item["precio"], item["cantidad"])
+        tabla.insert("", "end", iid=i, values=datos)
+        tabla_caja.insert("", "end", iid=i, values=datos)
+
+def agregar():
+    p = producto.get()
+    pr = precio.get()
+    c = cantidad.get()
+
+    if p == "" or pr == "" or c == "":
+        return
+
+    inventario.append({
+        "producto": p,
+        "precio": int(pr),
+        "cantidad": int(c)
+    })
+
+    guardar()
+    actualizar_lista()
+
+# ---------------- INTERFAZ ---------------- #
+
+ventana = tk.Tk()
+ventana.title("Sistema PRO MAX")
+ventana.geometry("900x550")
+
+# ---------------- LOGIN ---------------- #
+frame_login = tk.Frame(ventana)
+frame_login.pack(fill="both", expand=True)
+
+tk.Label(frame_login, text="LOGIN", font=("Arial", 20)).pack(pady=20)
+
+user = tk.Entry(frame_login)
+user.pack()
+
+password = tk.Entry(frame_login, show="*")
+password.pack()
+
+tk.Button(frame_login, text="Entrar", command=login).pack(pady=10)
+
+# ---------------- SISTEMA ---------------- #
+frame_sistema = tk.Frame(ventana)
+
+# MENU SUPERIOR
+menu_bar = tk.Frame(frame_sistema, bg="#00a8a8", height=40)
+menu_bar.pack(fill="x")
+
+tk.Button(menu_bar, text="INICIO", bg="#00a8a8", fg="white", bd=0,
+          command=lambda: mostrar(frame_inicio)).pack(side="left", padx=10)
+
+tk.Button(menu_bar, text="INVENTARIO", bg="#00a8a8", fg="white", bd=0,
+          command=lambda: mostrar(frame_inventario)).pack(side="left", padx=10)
+
+tk.Button(menu_bar, text="CAJA", bg="#00a8a8", fg="white", bd=0,
+          command=lambda: mostrar(frame_caja)).pack(side="left", padx=10)
+
+# ---------------- INICIO ---------------- #
+frame_inicio = tk.Frame(frame_sistema)
+tk.Label(frame_inicio, text="BIENVENIDO", font=("Arial", 30)).pack(pady=100)
+
+# ---------------- INVENTARIO ---------------- #
+frame_inventario = tk.Frame(frame_sistema)
+
+tk.Label(frame_inventario, text="INVENTARIO", font=("Arial", 16)).pack()
+
+producto = tk.Entry(frame_inventario)
+producto.pack()
+
+precio = tk.Entry(frame_inventario)
+precio.pack()
+
+cantidad = tk.Entry(frame_inventario)
+cantidad.pack()
+
+tk.Button(frame_inventario, text="Agregar", command=agregar).pack()
+
+# TABLA
+tabla = ttk.Treeview(frame_inventario, columns=("p", "pr", "c"), show="headings")
+tabla.heading("p", text="Producto")
+tabla.heading("pr", text="Precio")
+tabla.heading("c", text="Cantidad")
+tabla.pack(fill="both", expand=True)
+
+# ---------------- CAJA ---------------- #
+frame_caja = tk.Frame(frame_sistema)
+
+tk.Label(frame_caja, text="CAJA", font=("Arial", 16)).pack()
+
+tabla_caja = ttk.Treeview(frame_caja, columns=("p", "pr", "c"), show="headings")
+tabla_caja.heading("p", text="Producto")
+tabla_caja.heading("pr", text="Precio")
+tabla_caja.heading("c", text="Cantidad")
+tabla_caja.pack(fill="both", expand=True)
+
+# BOTONES TIPO POS
+panel_botones = tk.Frame(frame_caja)
+panel_botones.pack()
+
+tk.Button(panel_botones, text="COBRAR", bg="orange", width=15).pack(side="left", padx=10)
+tk.Button(panel_botones, text="QUITAR", bg="red", width=15).pack(side="left", padx=10)
+
+# ---------------- INICIO ---------------- #
+cargar()
+mostrar(frame_inicio)
+
+ventana.mainloop()
