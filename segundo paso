@@ -1,0 +1,216 @@
+import tkinter as tk
+from tkinter import messagebox, ttk
+import json
+import os
+
+ARCHIVO = "inventario.json"
+inventario = []
+
+# ---------------- DATOS LOGIN ---------------- #
+USUARIO = "Anderson"
+PASSWORD = "1234"
+
+# ---------------- FUNCIONES ---------------- #
+
+def guardar_datos():
+    with open(ARCHIVO, "w") as f:
+        json.dump(inventario, f)
+
+def cargar_datos():
+    global inventario
+    if os.path.exists(ARCHIVO):
+        with open(ARCHIVO, "r") as f:
+            inventario = json.load(f)
+
+def actualizar_lista():
+    lista.delete(0, tk.END)
+    lista_caja.delete(0, tk.END)
+
+    for item in inventario:
+        texto = f"{item['producto']} - ${item['precio']} - Cantidad: {item['cantidad']}"
+        lista.insert(tk.END, texto)
+        lista_caja.insert(tk.END, texto)
+
+def limpiar():
+    entrada_producto.delete(0, tk.END)
+    entrada_precio.delete(0, tk.END)
+    entrada_cantidad.delete(0, tk.END)
+
+def agregar():
+    producto = entrada_producto.get()
+    precio = entrada_precio.get()
+    cantidad = entrada_cantidad.get()
+
+    if producto == "" or precio == "" or cantidad == "":
+        messagebox.showwarning("Error", "Completa todos los campos")
+        return
+
+    if not precio.isdigit() or not cantidad.isdigit():
+        messagebox.showwarning("Error", "Solo números en precio y cantidad")
+        return
+
+    inventario.append({
+        "producto": producto,
+        "precio": int(precio),
+        "cantidad": int(cantidad)
+    })
+
+    guardar_datos()
+    actualizar_lista()
+    limpiar()
+
+def eliminar():
+    seleccion = lista.curselection()
+
+    if not seleccion:
+        messagebox.showwarning("Error", "Selecciona un producto")
+        return
+
+    index = seleccion[0]
+    inventario.pop(index)
+
+    guardar_datos()
+    actualizar_lista()
+
+def actualizar():
+    seleccion = lista.curselection()
+
+    if not seleccion:
+        messagebox.showwarning("Error", "Selecciona un producto")
+        return
+
+    producto = entrada_producto.get()
+    precio = entrada_precio.get()
+    cantidad = entrada_cantidad.get()
+
+    if producto == "" or precio == "" or cantidad == "":
+        messagebox.showwarning("Error", "Completa todos los campos")
+        return
+
+    if not precio.isdigit() or not cantidad.isdigit():
+        messagebox.showwarning("Error", "Solo números")
+        return
+
+    index = seleccion[0]
+
+    inventario[index] = {
+        "producto": producto,
+        "precio": int(precio),
+        "cantidad": int(cantidad)
+    }
+
+    guardar_datos()
+    actualizar_lista()
+    limpiar()
+
+def seleccionar_item(event):
+    try:
+        index = lista.curselection()[0]
+        item = inventario[index]
+
+        limpiar()
+        entrada_producto.insert(0, item["producto"])
+        entrada_precio.insert(0, item["precio"])
+        entrada_cantidad.insert(0, item["cantidad"])
+    except:
+        pass
+
+# ---------------- LOGIN ---------------- #
+
+def verificar_login():
+    user = entrada_user.get()
+    password = entrada_pass.get()
+
+    if user == USUARIO and password == PASSWORD:
+        frame_login.pack_forget()
+        frame_menu.pack(fill="both", expand=True)
+    else:
+        messagebox.showerror("Error", "Usuario o contraseña incorrectos")
+
+# ---------------- NAVEGACION ---------------- #
+
+def ir_inventario():
+    frame_menu.pack_forget()
+    frame_inventario.pack(fill="both", expand=True)
+    actualizar_lista()
+
+def ir_caja():
+    frame_menu.pack_forget()
+    frame_caja.pack(fill="both", expand=True)
+    actualizar_lista()
+
+def volver_menu(frame_actual):
+    frame_actual.pack_forget()
+    frame_menu.pack(fill="both", expand=True)
+
+# ---------------- INTERFAZ ---------------- #
+
+ventana = tk.Tk()
+ventana.title("Sistema PRO")
+ventana.geometry("500x550")
+
+# ---------------- LOGIN ---------------- #
+frame_login = tk.Frame(ventana)
+frame_login.pack(fill="both", expand=True)
+
+tk.Label(frame_login, text="LOGIN", font=("Arial", 18)).pack(pady=20)
+
+tk.Label(frame_login, text="Usuario").pack()
+entrada_user = tk.Entry(frame_login)
+entrada_user.pack()
+
+tk.Label(frame_login, text="Contraseña").pack()
+entrada_pass = tk.Entry(frame_login, show="*")
+entrada_pass.pack()
+
+tk.Button(frame_login, text="Entrar", command=verificar_login).pack(pady=10)
+
+# ---------------- MENU ---------------- #
+frame_menu = tk.Frame(ventana)
+
+tk.Label(frame_menu, text="MENÚ PRINCIPAL", font=("Arial", 18)).pack(pady=20)
+
+tk.Button(frame_menu, text="Inventario", width=20, command=ir_inventario).pack(pady=10)
+tk.Button(frame_menu, text="Caja", width=20, command=ir_caja).pack(pady=10)
+
+# ---------------- INVENTARIO ---------------- #
+frame_inventario = tk.Frame(ventana)
+
+tk.Label(frame_inventario, text="INVENTARIO", font=("Arial", 16)).pack(pady=10)
+
+tk.Label(frame_inventario, text="Producto").pack()
+entrada_producto = tk.Entry(frame_inventario)
+entrada_producto.pack()
+
+tk.Label(frame_inventario, text="Precio").pack()
+entrada_precio = tk.Entry(frame_inventario)
+entrada_precio.pack()
+
+tk.Label(frame_inventario, text="Cantidad").pack()
+entrada_cantidad = tk.Entry(frame_inventario)
+entrada_cantidad.pack()
+
+tk.Button(frame_inventario, text="Agregar", command=agregar).pack(pady=5)
+tk.Button(frame_inventario, text="Actualizar", command=actualizar).pack(pady=5)
+tk.Button(frame_inventario, text="Eliminar", command=eliminar).pack(pady=5)
+
+lista = tk.Listbox(frame_inventario)
+lista.pack(fill=tk.BOTH, expand=True)
+
+lista.bind("<<ListboxSelect>>", seleccionar_item)
+
+tk.Button(frame_inventario, text="Volver", command=lambda: volver_menu(frame_inventario)).pack(pady=10)
+
+# ---------------- CAJA ---------------- #
+frame_caja = tk.Frame(ventana)
+
+tk.Label(frame_caja, text="CAJA", font=("Arial", 16)).pack(pady=10)
+
+lista_caja = tk.Listbox(frame_caja)
+lista_caja.pack(fill=tk.BOTH, expand=True)
+
+tk.Button(frame_caja, text="Volver", command=lambda: volver_menu(frame_caja)).pack(pady=10)
+
+# ---------------- INICIO ---------------- #
+cargar_datos()
+ventana.mainloop()
