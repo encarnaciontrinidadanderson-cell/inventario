@@ -1,0 +1,149 @@
+import tkinter as tk
+from tkinter import ttk
+
+# ---------------- FUNCION PARA CAMBIAR PANTALLA ---------------- #
+
+def mostrar(frame):
+    for f in frames:
+        f.pack_forget()
+    frame.pack(fill="both", expand=True)
+
+# ---------------- VENTANA PRINCIPAL ---------------- #
+
+ventana = tk.Tk()
+ventana.title("Sistema Empresarial")
+ventana.geometry("1000x600")
+
+# ---------------- MENU SUPERIOR ---------------- #
+
+menu = tk.Frame(ventana, bg="#00a8a8", height=40)
+menu.pack(fill="x")
+
+# CONTENEDOR
+contenedor = tk.Frame(ventana)
+contenedor.pack(fill="both", expand=True)
+
+# ---------------- FRAMES (MODULOS) ---------------- #
+
+# INICIO
+frame_inicio = tk.Frame(contenedor)
+tk.Label(frame_inicio, text="BIENVENIDO", font=("Arial", 30)).pack(pady=100)
+
+# PRODUCTO
+frame_producto = tk.Frame(contenedor)
+tk.Label(frame_producto, text="GESTIÓN DE PRODUCTOS", font=("Arial", 20)).pack()
+
+tk.Label(frame_producto, text="Nombre").pack()
+entry_nombre = tk.Entry(frame_producto)
+entry_nombre.pack()
+
+tk.Label(frame_producto, text="Precio").pack()
+entry_precio = tk.Entry(frame_producto)
+entry_precio.pack()
+
+tk.Label(frame_producto, text="Cantidad").pack()
+entry_cantidad = tk.Entry(frame_producto)
+entry_cantidad.pack()
+
+tabla_producto = ttk.Treeview(frame_producto, columns=("n", "p", "c"), show="headings")
+tabla_producto.heading("n", text="Nombre")
+tabla_producto.heading("p", text="Precio")
+tabla_producto.heading("c", text="Cantidad")
+tabla_producto.pack(fill="both", expand=True)
+
+# VENTAS (CAJA)
+frame_ventas = tk.Frame(contenedor)
+tk.Label(frame_ventas, text="CAJA / VENTAS", font=("Arial", 20)).pack()
+
+tabla_ventas = ttk.Treeview(frame_ventas, columns=("n", "p", "c"), show="headings")
+tabla_ventas.heading("n", text="Producto")
+tabla_ventas.heading("p", text="Precio")
+tabla_ventas.heading("c", text="Cantidad")
+tabla_ventas.pack(fill="both", expand=True)
+
+panel_botones = tk.Frame(frame_ventas)
+panel_botones.pack()
+
+tk.Button(panel_botones, text="COBRAR", bg="orange", width=15).pack(side="left", padx=10)
+tk.Button(panel_botones, text="QUITAR", bg="red", width=15).pack(side="left", padx=10)
+
+# COMPRAS
+frame_compras = tk.Frame(contenedor)
+tk.Label(frame_compras, text="COMPRAS", font=("Arial", 20)).pack()
+tk.Label(frame_compras, text="Aquí registrarás compras").pack()
+
+# ALMACEN
+frame_almacen = tk.Frame(contenedor)
+tk.Label(frame_almacen, text="ALMACÉN", font=("Arial", 20)).pack()
+
+tabla_almacen = ttk.Treeview(frame_almacen, columns=("n", "p", "c"), show="headings")
+tabla_almacen.heading("n", text="Producto")
+tabla_almacen.heading("p", text="Precio")
+tabla_almacen.heading("c", text="Stock")
+tabla_almacen.pack(fill="both", expand=True)
+
+# PRODUCCION
+frame_produccion = tk.Frame(contenedor)
+tk.Label(frame_produccion, text="PRODUCCIÓN", font=("Arial", 20)).pack()
+tk.Label(frame_produccion, text="Módulo en desarrollo").pack()
+
+# ADMIN
+frame_admin = tk.Frame(contenedor)
+tk.Label(frame_admin, text="ADMINISTRACIÓN", font=("Arial", 20)).pack()
+tk.Label(frame_admin, text="Usuarios y permisos").pack()
+
+# REPORTE
+frame_reporte = tk.Frame(contenedor)
+tk.Label(frame_reporte, text="REPORTES", font=("Arial", 20)).pack()
+tk.Label(frame_reporte, text="Resumen de ventas y productos").pack()
+
+# SISTEMA
+frame_sistema = tk.Frame(contenedor)
+tk.Label(frame_sistema, text="CONFIGURACIÓN DEL SISTEMA", font=("Arial", 20)).pack()
+
+# LISTA DE FRAMES
+frames = [
+    frame_inicio,
+    frame_producto,
+    frame_ventas,
+    frame_compras,
+    frame_almacen,
+    frame_produccion,
+    frame_admin,
+    frame_reporte,
+    frame_sistema
+]
+
+# ---------------- BOTONES MENU ---------------- #
+
+tk.Button(menu, text="INICIO", bg="#00a8a8", fg="white", bd=0,
+          command=lambda: mostrar(frame_inicio)).pack(side="left", padx=10)
+
+tk.Button(menu, text="PRODUCTO", bg="#00a8a8", fg="white", bd=0,
+          command=lambda: mostrar(frame_producto)).pack(side="left", padx=10)
+
+tk.Button(menu, text="VENTAS", bg="#00a8a8", fg="white", bd=0,
+          command=lambda: mostrar(frame_ventas)).pack(side="left", padx=10)
+
+tk.Button(menu, text="COMPRAS", bg="#00a8a8", fg="white", bd=0,
+          command=lambda: mostrar(frame_compras)).pack(side="left", padx=10)
+
+tk.Button(menu, text="ALMACÉN", bg="#00a8a8", fg="white", bd=0,
+          command=lambda: mostrar(frame_almacen)).pack(side="left", padx=10)
+
+tk.Button(menu, text="PRODUCCIÓN", bg="#00a8a8", fg="white", bd=0,
+          command=lambda: mostrar(frame_produccion)).pack(side="left", padx=10)
+
+tk.Button(menu, text="ADMIN", bg="#00a8a8", fg="white", bd=0,
+          command=lambda: mostrar(frame_admin)).pack(side="left", padx=10)
+
+tk.Button(menu, text="REPORTE", bg="#00a8a8", fg="white", bd=0,
+          command=lambda: mostrar(frame_reporte)).pack(side="left", padx=10)
+
+tk.Button(menu, text="SISTEMA", bg="#00a8a8", fg="white", bd=0,
+          command=lambda: mostrar(frame_sistema)).pack(side="left", padx=10)
+
+# INICIO
+mostrar(frame_inicio)
+
+ventana.mainloop()
